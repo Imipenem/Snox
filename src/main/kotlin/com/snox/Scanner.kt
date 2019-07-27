@@ -42,7 +42,16 @@ data class Scanner(val source:String) {
             '=' -> addToken(if (match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '>' -> addToken(if (match('=')) TokenType.GREATER_EQ else TokenType.GREATER)
             '<' -> addToken(if (match('=')) TokenType.SMALLER_EQ else TokenType.SMALLER)
-            else -> error(line, "Unexpected Character.")
+            '/' -> {
+                if(match('/')){
+                    while (peek() != '\n' && !isAtEnd()){
+                        advance()
+                    }
+                }
+                else addToken(TokenType.SLASH)
+            }
+            '\n' -> line++
+            else -> if(c != ' ' && c != '\r' && c != '\t') error(line, "Unexpected Character.")
         }
 
     }
@@ -71,5 +80,6 @@ data class Scanner(val source:String) {
         return false
     }
 
+    private fun peek()  = if(isAtEnd()) '\u0000' else source[current]
 
 }
