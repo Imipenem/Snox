@@ -2,11 +2,27 @@ package com.snox
 
 private val tokens = ArrayList<Token>()
 
+/**
+ * This class represents the scanner. A scanner scans the entire source code (line by line) and defragmentates this string
+ * into (multiple) valid tokens (or reports an error of its invalid).
+ *
+ * Note that this does not currently perform any typ of operator precedence checks or valid parenthesis order and similar.
+ *
+ * TODO: Implementation for keywords/identifiere token support
+ */
+
 data class Scanner(val source:String) {
 
     private var start = 0
     private var current = 0
     private var line = 1
+
+    /**
+     * The wrapper function for scanning all tokens until the end of the source code.
+     *
+     * Note that this function puts a special EOF (end of file) into the list of tokens when the file has been
+     * read to end.
+     */
 
     fun scanTokens(): List<Token>{
 
@@ -19,7 +35,14 @@ data class Scanner(val source:String) {
     }
 
     /**
+     *  This is the main function if the scanner class.
+     *  It scans the source string "character by character" and check what token is the most valid (and the most likely one).
      *
+     *  It made various distinctions between single character (and two character) tokens and is able to scan string
+     *  and number tokens (if they're formatted correctly).
+     *
+     *  Note that comments (// and whitespaces as well as \r and \t) are simply ignored.
+     *  The line field is responsible for a better error reporting functionality.
      *
      * TODO: Coalescing the single error messages into one (in case of many unexpected characters)
      */
@@ -58,22 +81,40 @@ data class Scanner(val source:String) {
 
     }
 
+    /**
+     * This method checks whether the end of the string has been reached or not
+     */
     private fun isAtEnd() = current >= source.length
 
+    /**
+     * Advance and return the current char
+     */
     private fun advance():Char {
         current++
         return source[current - 1]
     }
 
+    /**
+     * Add a token to the list without a special literal
+     */
     private fun addToken(type:TokenType){
         addToken(type,null)
     }
 
+    /**
+     * Add a token to the list WITH a special literal (for example tokens of type string)
+     */
     private fun addToken(type: TokenType, literal:Any?){
         val snoxeme = source.substring(start,current)
         tokens.add(Token(type, snoxeme, literal, line))
     }
 
+    /**
+     * Search for the end of the current string token (if there's none report an error).
+     * Multiple lines strings are supported.
+     *
+     * The actual value of a string token is the string (but with the " omitted)
+     */
     private fun string() {
         while(!isAtEnd() && peek() != '"'){
             if(peek() == '\n') line++
@@ -88,6 +129,9 @@ data class Scanner(val source:String) {
         addToken(TokenType.STRING,value)
     }
 
+    /**
+     * Scans a number token of format [0-9]*.[0-9]*
+     */
     private fun number(){
         while (isDigit(peek())){
             advance()
@@ -102,8 +146,14 @@ data class Scanner(val source:String) {
 
     }
 
+    /**
+     * Determines whether a given char is a digit or not
+     */
     private fun isDigit(c:Char) = c in '0'..'9'
 
+    /**
+     * Determines whether the next char matches the expected char (If it's at the end it returns false)
+     */
     private fun match(expected:Char): Boolean{
         if(isAtEnd()) return false
         if(source[current] == expected) return true
@@ -112,7 +162,13 @@ data class Scanner(val source:String) {
         return false
     }
 
+    /**
+     * Peek at the current char (that's what is called a lookahead) and return if not at the end else return null char
+     */
     private fun peek()  = if(isAtEnd()) '\u0000' else source[current]
 
+    /**
+     * Peek at the next char and return if not at the end else return null char
+     */
     private fun peekNext() = if(current + 1 >= source.length) '\u0000' else source[current + 1]
 }
