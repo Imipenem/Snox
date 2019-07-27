@@ -27,12 +27,24 @@ fun main(args:Array<String>) {
 
 }
 
+/**
+ * This method is invoked when a file will be used for compilation/ the interpreter as the file containing the
+ * source code.
+ */
+
 @Throws (IOException::class)
 private fun runFile(path:String){
     val bytes = Files.readAllBytes(Paths.get(path))
     run(String(bytes, Charset.defaultCharset()))
 }
 
+/**
+ * This method is used for an interactive "line by line" scanning from the command line.
+ * Each line will be read and scanned separately.
+ *
+ * Note that the hadError field will be reset after each run() invocation to not crash the whole session because of
+ * one error (like a missing "," or sth. similar)
+ */
 @Throws (IOException::class)
 private fun runPrompt(){
     val input = InputStreamReader(System.`in`)
