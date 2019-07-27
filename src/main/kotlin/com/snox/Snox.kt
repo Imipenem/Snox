@@ -67,7 +67,7 @@ private fun runPrompt(){
 
 private fun run(source:String){
     if(hadError) exitProcess(65)
-    val scanner = Scanner(source) //Scanner class will be created asap
+    val scanner = Scanner(source)
     val tokens = scanner.scanTokens()
 
     for (e in tokens){

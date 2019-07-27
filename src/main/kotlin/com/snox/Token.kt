@@ -7,7 +7,7 @@ package com.snox
  * TODO: Calculate an offset for better error reporting functionality!
  */
 
-data class Token(val type: TokenType, val snoxeme:String, val literal:Any, val line:Int) {
+data class Token(val type: TokenType, val snoxeme:String, val literal:Any?, val line:Int) {
 
     override fun toString() = "$type + $snoxeme + $literal"
 }
