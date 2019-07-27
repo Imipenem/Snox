@@ -42,6 +42,7 @@ data class Scanner(val source:String) {
             '=' -> addToken(if (match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '>' -> addToken(if (match('=')) TokenType.GREATER_EQ else TokenType.GREATER)
             '<' -> addToken(if (match('=')) TokenType.SMALLER_EQ else TokenType.SMALLER)
+            '"' -> string()
             '/' -> {
                 if(match('/')){
                     while (peek() != '\n' && !isAtEnd()){
@@ -51,6 +52,7 @@ data class Scanner(val source:String) {
                 else addToken(TokenType.SLASH)
             }
             '\n' -> line++
+            in '0'..'9' -> number()
             else -> if(c != ' ' && c != '\r' && c != '\t') error(line, "Unexpected Character.")
         }
 
@@ -72,6 +74,36 @@ data class Scanner(val source:String) {
         tokens.add(Token(type, snoxeme, literal, line))
     }
 
+    private fun string() {
+        while(!isAtEnd() && peek() != '"'){
+            if(peek() == '\n') line++
+            advance()
+        }
+
+        if(isAtEnd()) error(line, "Unterminated String.")
+
+        advance()
+
+        val value = source.substring(start + 1, current - 1)
+        addToken(TokenType.STRING,value)
+    }
+
+    private fun number(){
+        while (isDigit(peek())){
+            advance()
+        }
+        if(peek() == '.' && isDigit(peekNext())) advance()
+
+        while (isDigit(peek())){
+            advance()
+        }
+
+        addToken(TokenType.NUMBER, source.substring(start, current).toDouble())
+
+    }
+
+    private fun isDigit(c:Char) = c in '0'..'9'
+
     private fun match(expected:Char): Boolean{
         if(isAtEnd()) return false
         if(source[current] == expected) return true
@@ -82,4 +114,5 @@ data class Scanner(val source:String) {
 
     private fun peek()  = if(isAtEnd()) '\u0000' else source[current]
 
+    private fun peekNext() = if(current + 1 >= source.length) '\u0000' else source[current + 1]
 }
