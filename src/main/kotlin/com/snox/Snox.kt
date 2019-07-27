@@ -12,6 +12,8 @@ class Snox {
 
 }
 
+var hadError = false
+
 @Throws (IOException::class)
 fun main(args:Array<String>) {
     when{
@@ -39,6 +41,7 @@ private fun runPrompt(){
     while(true){
         println("> ")
         run(reader.readLine())
+        hadError = false
     }
 }
 /**
@@ -51,10 +54,21 @@ private fun runPrompt(){
  */
 
 private fun run(source:String){
+    if(hadError) exitProcess(65)
     val scanner = Scanner(source) //Scanner class will be created asap
     val tokens = scanner.scanTokens()
 
     for (e in tokens){
         println(e)
     }
+}
+
+fun error(line:Int, message:String){
+    report(line,"",message)
+}
+
+private fun report (line:Int, where:String, message:String){
+    System.err.println((
+            "[line $line] Error$where: $message"))
+    hadError = true
 }
