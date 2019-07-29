@@ -1,6 +1,10 @@
 package com.snox
 
 private val tokens = ArrayList<Token>()
+private val keywords = hashMapOf("and" to TokenType.AND, "or" to TokenType.OR, "if" to TokenType.IF, "else" to TokenType.ELSE,
+        "nil" to TokenType.NIL, "fun" to TokenType.FUN, "while" to TokenType.WHILE, "for" to TokenType.FOR, "print" to TokenType.PRINT,
+        "return" to TokenType.RETURN, "var" to TokenType.VAR, "true" to TokenType.TRUE, "false" to TokenType.FALSE, "class" to TokenType.CLASS,
+        "super" to TokenType.SUPER, "this" to TokenType.THIS)
 
 /**
  * This class represents the scanner. A scanner scans the entire source code (line by line) and defragmentates this string
@@ -76,7 +80,11 @@ data class Scanner(val source:String) {
             }
             '\n' -> line++
             in '0'..'9' -> number()
-            else -> if(c != ' ' && c != '\r' && c != '\t') error(line, "Unexpected Character.")
+            else -> {
+                if (c != ' ' && c != '\r' && c != '\t') error(line, "Unexpected Character.")
+
+                else if (isAlpha(c)) identifier()
+            }
         }
 
     }
@@ -150,6 +158,32 @@ data class Scanner(val source:String) {
      * Determines whether a given char is a digit or not
      */
     private fun isDigit(c:Char) = c in '0'..'9'
+
+    /**
+     * Checks, if a character is an underscore or a letter (lowercae OR uppercase)
+     */
+    private fun isAlpha(c:Char) = c == '_' || c in 'a'..'z' || c in 'A'..'Z'
+
+    /**
+     * Checks, whether a character is a letter or a digit
+     */
+    private fun isAlphanumeric(c:Char) = isAlpha(c) || isDigit(c)
+
+    /**
+     * This method "generates" an identifier. We also determine whether we encountered a reserved keyword or an identifier.
+     *
+     * It uses the MAX MUNCH principle: The more character a string matches the more probabilistic it is that it is THIS special
+     * keyword/identifier.
+     */
+    private fun identifier(){
+        while (isAlphanumeric(peek())){
+            advance()
+        }
+        val identifier = source.substring(start,current)
+
+        if(keywords.containsKey(identifier)) addToken(keywords.getValue(identifier))
+        else addToken(TokenType.IDENTIFIER)
+    }
 
     /**
      * Determines whether the next char matches the expected char (If it's at the end it returns false)
