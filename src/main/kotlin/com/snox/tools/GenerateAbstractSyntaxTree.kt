@@ -34,7 +34,9 @@ private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String
     writer.println("/**")
     writer.println("* Auto generated AST for parsing SNOX expressions (Superclass Expr for clarification only) ")
     writer.println("*/")
-    writer.println("abstract class Expr")
+    writer.println("abstract class Expr{")
+    writer.println("abstract fun <T> accept(visitor: Visitor<T>):T")
+    writer.println("}")
     writer.println()
 
     defineVisitor(writer,baseName,types)
@@ -45,7 +47,7 @@ private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String
     for(e in types){
         val descr = e.trim().split(";")
         writer.println("class ${descr[0].trim()}(${descr[1]}):Expr(){")
-        writer.println("fun <T> accept(visitor:Visitor<T>) = visitor.visit${descr[0].trim()}$baseName(this)")
+        writer.println("override fun <T> accept(visitor:Visitor<T>) = visitor.visit${descr[0].trim()}$baseName(this)")
         writer.println("}")
         writer.println()
     }
