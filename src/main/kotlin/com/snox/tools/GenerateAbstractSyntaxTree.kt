@@ -28,15 +28,37 @@ private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String
     val path = "$outputDir/$baseName.kt"
     val writer = PrintWriter(path, "UTF-8")
 
+    writer.println("package com.snox.parser.expr")
     writer.println("import com.snox.token.Token")
     writer.println()
+    writer.println("/**")
+    writer.println("* Auto generated AST for parsing SNOX expressions (Superclass Expr for clarification only) ")
+    writer.println("*/")
     writer.println("abstract class Expr")
     writer.println()
 
+    defineVisitor(writer,baseName,types)
+    writer.println()
+
+
+
     for(e in types){
         val descr = e.trim().split(";")
-        writer.println("class ${descr[0].trim()}(${descr[1]}):Expr()")
+        writer.println("class ${descr[0].trim()}(${descr[1]}):Expr(){")
+        writer.println("fun <T> accept(visitor:Visitor<T>) = visitor.visit${descr[0].trim()}$baseName(this)")
+        writer.println("}")
         writer.println()
     }
     writer.close()
+}
+
+private fun defineVisitor(writer: PrintWriter, baseName: String, types: ArrayList<String>){
+
+    writer.println("interface Visitor <T> { ")
+    for (e in types){
+        val descr = e.trim().split(";")
+        val typeName = descr[0].trim()
+        writer.println("fun visit$typeName$baseName(${baseName.toLowerCase()}:$typeName):T")
+    }
+    writer.println("}")
 }
