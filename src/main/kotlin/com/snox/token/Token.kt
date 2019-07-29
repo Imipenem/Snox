@@ -1,4 +1,4 @@
-package com.snox
+package com.snox.token
 
 /**
  * This class represents a token with a type, it´s representation in the source code (called the snoxeme), a (possible)

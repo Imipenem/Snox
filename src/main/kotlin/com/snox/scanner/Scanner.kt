@@ -1,4 +1,7 @@
-package com.snox
+package com.snox.scanner
+
+import com.snox.token.Token
+import com.snox.token.TokenType
 
 private val tokens = ArrayList<Token>()
 private val keywords = hashMapOf("and" to TokenType.AND, "or" to TokenType.OR, "if" to TokenType.IF, "else" to TokenType.ELSE,
@@ -34,7 +37,7 @@ data class Scanner(val source:String) {
             start = current
             scanToken()
         }
-        tokens.add(Token(TokenType.EOF,"",null, line))
+        tokens.add(Token(TokenType.EOF, "", null, line))
         return tokens
     }
 
@@ -81,7 +84,7 @@ data class Scanner(val source:String) {
             '\n' -> line++
             in '0'..'9' -> number()
             else -> {
-                if (c != ' ' && c != '\r' && c != '\t') error(line, "Unexpected Character.")
+                if (c != ' ' && c != '\r' && c != '\t') com.snox.error(line, "Unexpected Character.")
 
                 else if (isAlpha(c)) identifier()
             }
@@ -105,7 +108,7 @@ data class Scanner(val source:String) {
     /**
      * Add a token to the list without a special literal
      */
-    private fun addToken(type:TokenType){
+    private fun addToken(type: TokenType){
         addToken(type,null)
     }
 
@@ -129,7 +132,7 @@ data class Scanner(val source:String) {
             advance()
         }
 
-        if(isAtEnd()) error(line, "Unterminated String.")
+        if(isAtEnd()) com.snox.error(line, "Unterminated String.")
 
         advance()
 

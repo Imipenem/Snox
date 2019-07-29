@@ -1,4 +1,4 @@
-package com.snox
+package com.snox.token
 
 /**
  * This enum class is used to specify the various types of tokens in the SNOX programming language (the very few basic ones).
