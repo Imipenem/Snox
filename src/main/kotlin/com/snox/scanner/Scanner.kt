@@ -15,7 +15,6 @@ private val keywords = hashMapOf("and" to TokenType.AND, "or" to TokenType.OR, "
  *
  * Note that this does not currently perform any typ of operator precedence checks or valid parenthesis order and similar.
  *
- * TODO: Implementation for keywords/identifiere token support
  */
 
 data class Scanner(val source:String) {
