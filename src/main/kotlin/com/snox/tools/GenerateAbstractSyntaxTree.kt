@@ -22,6 +22,13 @@ fun main(args:Array<String>){
 
 }
 
+/**
+ * This function writes the basic AST setup class file with an Expression class as the superclass and the different expressions
+ * derived from them (for example binary expressions like "a + b").
+ *
+ * New types of expressions can be simply added by adding them into the list above in main()!
+ */
+
 @Throws (IOException::class)
 private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String>){
 
@@ -54,6 +61,9 @@ private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String
     writer.close()
 }
 
+/**
+ * This function defines the visitor interface with a visit() for each expression (subclass) and prints them.
+ */
 private fun defineVisitor(writer: PrintWriter, baseName: String, types: ArrayList<String>){
 
     writer.println("interface Visitor <T> { ")
