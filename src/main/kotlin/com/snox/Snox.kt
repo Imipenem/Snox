@@ -1,6 +1,10 @@
 package com.snox
 
+import com.snox.parser.Parser
 import com.snox.scanner.Scanner
+import com.snox.token.Token
+import com.snox.token.TokenType
+import com.snox.tools.AstPrinter
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -69,9 +73,12 @@ private fun run(source:String){
     val scanner = Scanner(source)
     val tokens = scanner.scanTokens()
 
-    for (e in tokens){
-        println(e)
-    }
+    val parser = Parser(tokens)
+    val expression = parser.parse()
+
+    if (hadError) return
+
+    println(AstPrinter().print(expression!!))
 }
 
 fun error(line:Int, message:String){
@@ -82,4 +89,9 @@ private fun report (line:Int, where:String, message:String){
     System.err.println((
             "[line $line] Error$where: $message"))
     hadError = true
+}
+
+fun error(token:Token, message: String){
+    if(token.type == TokenType.EOF) report(token.line, "at end", message)
+    else report(token.line, " at '${token.snoxeme}'", message)
 }

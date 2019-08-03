@@ -1,5 +1,6 @@
 package com.snox.parser
 
+import com.snox.error as err
 import com.snox.parser.expr.Binary
 import com.snox.parser.expr.Expr
 import com.snox.parser.expr.Grouping
@@ -7,6 +8,7 @@ import com.snox.parser.expr.Literal
 import com.snox.parser.expr.Unary
 import com.snox.token.Token
 import com.snox.token.TokenType
+import java.lang.RuntimeException
 
 /**
  *
@@ -14,7 +16,24 @@ import com.snox.token.TokenType
 
 class Parser(private val tokens: List<Token>) {
 
+    class ParseError:RuntimeException()
+
     private var current = 0
+
+    /**
+     * This is the actual "parse" main function.
+     *
+     * As for now, it can only parse one line expressions and otherwise it returns null, in
+     * case of any Parse Errors thrown.
+     */
+    fun parse():Expr?{
+        return try {
+            expression()
+        }
+        catch (e:ParseError){
+            null
+        }
+    }
 
     private fun expression() = equality()
 
@@ -116,15 +135,42 @@ class Parser(private val tokens: List<Token>) {
 
             match(TokenType.LEFT_PAREN) -> {
                 val expr = expression()
-                consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+                consume(TokenType.RIGHT_PAREN, "Expect closing ')' after expression.")
                 return Grouping(expr)
             }
         }
-        return Literal("THISSHOULDNOTHAPPEN!")
+        throw error(peek(),"Expect expression")
     }
 
-    private fun match(vararg tokens: TokenType): Boolean {
-        for (type in tokens) {
+    private fun consume(type:TokenType, message:String):Token{
+        if(check(type)) return advance()
+
+        throw error(peek(), message)
+    }
+
+    private fun error(token: Token, message: String):ParseError{
+        err(token,message)
+        return ParseError()
+    }
+
+    private fun synchronize(){
+        advance()
+
+        while(!isAtEnd()){
+            if (previous().type == TokenType.SEMI_COL) return
+
+            when(peek().type) {
+                TokenType.CLASS, TokenType.VAR, TokenType.FUN, TokenType.IF, TokenType.WHILE,
+                TokenType.PRINT, TokenType.RETURN, TokenType.FOR -> return
+            }
+            advance()
+        }
+    }
+
+
+
+    private fun match(vararg types: TokenType): Boolean {
+        for (type in types) {
             if (check(type)) {
                 advance()
                 return true

@@ -192,10 +192,10 @@ data class Scanner(val source:String) {
      */
     private fun match(expected:Char): Boolean{
         if(isAtEnd()) return false
-        if(source[current] == expected) return true
+        if(source[current] != expected) return false
 
         current++
-        return false
+        return true
     }
 
     /**
