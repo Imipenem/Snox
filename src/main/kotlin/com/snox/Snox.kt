@@ -17,9 +17,9 @@ class Snox
 
 var hadError = false
 
-@Throws (IOException::class)
-fun main(args:Array<String>) {
-    when{
+@Throws(IOException::class)
+fun main(args: Array<String>) {
+    when {
         args.size > 1 -> {
             println("Usage: Snox [script]")
             exitProcess(64)
@@ -35,8 +35,8 @@ fun main(args:Array<String>) {
  * source code.
  */
 
-@Throws (IOException::class)
-private fun runFile(path:String){
+@Throws(IOException::class)
+private fun runFile(path: String) {
     val bytes = Files.readAllBytes(Paths.get(path))
     run(String(bytes, Charset.defaultCharset()))
 }
@@ -48,28 +48,28 @@ private fun runFile(path:String){
  * Note that the hadError field will be reset after each run() invocation to not crash the whole session because of
  * one error (like a missing "," or sth. similar)
  */
-@Throws (IOException::class)
-private fun runPrompt(){
+@Throws(IOException::class)
+private fun runPrompt() {
     val input = InputStreamReader(System.`in`)
     val reader = BufferedReader(input)
 
-    while(true){
+    while (true) {
         println("> ")
         run(reader.readLine())
         hadError = false
     }
 }
+
 /**
  * Main function for scanning the input (whether it´s a single command line line or ByteStream of a read File).
  *
  * Purpose of this function is to scan the source string and "divide" it into valid tokens that can be used for
  * further compilation.
  *
- * TODO: Current state: Simply print out the tokens for testing progress (it won´t compile as it is now)
  */
 
-private fun run(source:String){
-    if(hadError) exitProcess(65)
+private fun run(source: String) {
+    if (hadError) exitProcess(65)
     val scanner = Scanner(source)
     val tokens = scanner.scanTokens()
 
@@ -81,17 +81,17 @@ private fun run(source:String){
     println(AstPrinter().print(expression!!))
 }
 
-fun error(line:Int, message:String){
-    report(line,"",message)
+fun error(line: Int, message: String) {
+    report(line, "", message)
 }
 
-private fun report (line:Int, where:String, message:String){
+private fun report(line: Int, where: String, message: String) {
     System.err.println((
             "[line $line] Error$where: $message"))
     hadError = true
 }
 
-fun error(token:Token, message: String){
-    if(token.type == TokenType.EOF) report(token.line, "at end", message)
+fun error(token: Token, message: String) {
+    if (token.type == TokenType.EOF) report(token.line, "at end", message)
     else report(token.line, " at '${token.snoxeme}'", message)
 }

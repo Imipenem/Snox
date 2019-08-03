@@ -11,12 +11,15 @@ import com.snox.token.TokenType
 import java.lang.RuntimeException
 
 /**
- *
+ * This class represents the Parser used to parse scanned SNOX tokens into an AST besides some basic syntax error handling.
  */
 
 class Parser(private val tokens: List<Token>) {
 
-    class ParseError:RuntimeException()
+    /**
+     * Inner class to represent a ParseError
+     */
+    class ParseError : RuntimeException()
 
     private var current = 0
 
@@ -26,11 +29,10 @@ class Parser(private val tokens: List<Token>) {
      * As for now, it can only parse one line expressions and otherwise it returns null, in
      * case of any Parse Errors thrown.
      */
-    fun parse():Expr?{
+    fun parse(): Expr? {
         return try {
             expression()
-        }
-        catch (e:ParseError){
+        } catch (e: ParseError) {
             null
         }
     }
@@ -67,9 +69,9 @@ class Parser(private val tokens: List<Token>) {
     private fun comparison(): Expr {
         var expr = addition()
 
-        while(match(TokenType.GREATER, TokenType.GREATER_EQ, TokenType.SMALLER, TokenType.SMALLER_EQ)){
+        while (match(TokenType.GREATER, TokenType.GREATER_EQ, TokenType.SMALLER, TokenType.SMALLER_EQ)) {
             val operator = previous()
-            val right =  addition()
+            val right = addition()
 
             expr = Binary(expr, operator, right)
         }
@@ -79,10 +81,10 @@ class Parser(private val tokens: List<Token>) {
     /**
      * @see equality
      */
-    private fun addition():Expr{
+    private fun addition(): Expr {
         var expr = multiplication()
 
-        while(match(TokenType.PLUS, TokenType.MINUS)){
+        while (match(TokenType.PLUS, TokenType.MINUS)) {
             val operator = previous()
             val right = multiplication()
             expr = Binary(expr, operator, right)
@@ -93,10 +95,10 @@ class Parser(private val tokens: List<Token>) {
     /**
      * @see equality
      */
-    private fun multiplication():Expr{
+    private fun multiplication(): Expr {
         var expr = unary()
 
-        while (match(TokenType.SLASH, TokenType.STAR)){
+        while (match(TokenType.SLASH, TokenType.STAR)) {
             val operator = previous()
             val right = unary()
             expr = Binary(expr, operator, right)
@@ -109,8 +111,8 @@ class Parser(private val tokens: List<Token>) {
      *
      * It checks whether it encounters a - or ! (unary operators) and depending on this, processes further.
      */
-    private fun unary():Expr{
-        if(match(TokenType.MINUS, TokenType.BANG)){
+    private fun unary(): Expr {
+        if (match(TokenType.MINUS, TokenType.BANG)) {
             val operator = previous()
             val right = unary()
             return Unary(operator, right)
@@ -125,8 +127,8 @@ class Parser(private val tokens: List<Token>) {
      *
      * In case of a '(' (expect a ')' after) call expression() again.
      */
-    private fun primary():Expr{
-        when{
+    private fun primary(): Expr {
+        when {
             match(TokenType.FALSE) -> return Literal(false)
             match(TokenType.TRUE) -> return Literal(true)
             match(TokenType.NIL) -> return Literal(null)
@@ -139,27 +141,43 @@ class Parser(private val tokens: List<Token>) {
                 return Grouping(expr)
             }
         }
-        throw error(peek(),"Expect expression")
+        throw error(peek(), "Expect expression")
     }
 
-    private fun consume(type:TokenType, message:String):Token{
-        if(check(type)) return advance()
+    /**
+     * This function checks if a specified token type is met after some other expression (like an closing ) after a (.
+     *
+     * Otherwise it throws an ParseError with a message indicating which kind of error occurred.
+     */
+    private fun consume(type: TokenType, message: String): Token {
+        if (check(type)) return advance()
 
         throw error(peek(), message)
     }
 
-    private fun error(token: Token, message: String):ParseError{
-        err(token,message)
+    /**
+     * Helper function that calls the error() of com/snox/Snox.kt as a ParseError
+     */
+    private fun error(token: Token, message: String): ParseError {
+        err(token, message)
         return ParseError()
     }
 
-    private fun synchronize(){
+    /**
+     * !!!NOT IN USE ATM!!!
+     *
+     * Will be used for synchronizing the parser after an syntax/parse error occurred (Roughly spoken: Goto that place,
+     * where a new statement begins that can be parsed)
+     *
+     * Useful so that syntax errors don´t crash the whole parse process.
+     */
+    private fun synchronize() {
         advance()
 
-        while(!isAtEnd()){
+        while (!isAtEnd()) {
             if (previous().type == TokenType.SEMI_COL) return
 
-            when(peek().type) {
+            when (peek().type) {
                 TokenType.CLASS, TokenType.VAR, TokenType.FUN, TokenType.IF, TokenType.WHILE,
                 TokenType.PRINT, TokenType.RETURN, TokenType.FOR -> return
             }
@@ -168,7 +186,9 @@ class Parser(private val tokens: List<Token>) {
     }
 
 
-
+    /**
+     * Helper function to determine whether an actual token type matches some concret ones.
+     */
     private fun match(vararg types: TokenType): Boolean {
         for (type in types) {
             if (check(type)) {
@@ -179,16 +199,31 @@ class Parser(private val tokens: List<Token>) {
         return false
     }
 
+    /**
+     * When not at the end (TokenType != EOF) return if the current type matches @param type
+     */
     private fun check(type: TokenType) = if (isAtEnd()) false else peek().type == type
 
+    /**
+     * This function updates the pointer to the current token and returns last token.
+     */
     private fun advance(): Token {
         if (!isAtEnd()) current++
         return previous()
     }
 
+    /**
+     * @return the current token
+     */
     private fun peek() = tokens[current]
 
+    /**
+     * @return If we´re at the end while parsing
+     */
     private fun isAtEnd() = peek().type == TokenType.EOF
 
+    /**
+     * @return the last processed token (previous one)
+     */
     private fun previous() = tokens[current - 1]
 }

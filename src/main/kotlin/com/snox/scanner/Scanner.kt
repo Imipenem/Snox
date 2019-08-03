@@ -17,7 +17,7 @@ private val keywords = hashMapOf("and" to TokenType.AND, "or" to TokenType.OR, "
  *
  */
 
-data class Scanner(val source:String) {
+data class Scanner(val source: String) {
 
     private var start = 0
     private var current = 0
@@ -30,9 +30,9 @@ data class Scanner(val source:String) {
      * read to end.
      */
 
-    fun scanTokens(): List<Token>{
+    fun scanTokens(): List<Token> {
 
-        while(!isAtEnd()){
+        while (!isAtEnd()) {
             start = current
             scanToken()
         }
@@ -53,10 +53,10 @@ data class Scanner(val source:String) {
      * TODO: Coalescing the single error messages into one (in case of many unexpected characters)
      */
 
-    private fun scanToken(){
+    private fun scanToken() {
         val c = advance()
 
-        when(c) {
+        when (c) {
             '{' -> addToken(TokenType.LEFT_BRACE)
             '}' -> addToken(TokenType.RIGHT_BRACE)
             '(' -> addToken(TokenType.LEFT_PAREN)
@@ -73,18 +73,16 @@ data class Scanner(val source:String) {
             '<' -> addToken(if (match('=')) TokenType.SMALLER_EQ else TokenType.SMALLER)
             '"' -> string()
             '/' -> {
-                if(match('/')){
-                    while (peek() != '\n' && !isAtEnd()){
+                if (match('/')) {
+                    while (peek() != '\n' && !isAtEnd()) {
                         advance()
                     }
-                }
-                else addToken(TokenType.SLASH)
+                } else addToken(TokenType.SLASH)
             }
             '\n' -> line++
             in '0'..'9' -> number()
             else -> {
                 if (c != ' ' && c != '\r' && c != '\t') com.snox.error(line, "Unexpected Character.")
-
                 else if (isAlpha(c)) identifier()
             }
         }
@@ -99,7 +97,7 @@ data class Scanner(val source:String) {
     /**
      * Advance and return the current char
      */
-    private fun advance():Char {
+    private fun advance(): Char {
         current++
         return source[current - 1]
     }
@@ -107,15 +105,15 @@ data class Scanner(val source:String) {
     /**
      * Add a token to the list without a special literal
      */
-    private fun addToken(type: TokenType){
-        addToken(type,null)
+    private fun addToken(type: TokenType) {
+        addToken(type, null)
     }
 
     /**
      * Add a token to the list WITH a special literal (for example tokens of type string)
      */
-    private fun addToken(type: TokenType, literal:Any?){
-        val snoxeme = source.substring(start,current)
+    private fun addToken(type: TokenType, literal: Any?) {
+        val snoxeme = source.substring(start, current)
         tokens.add(Token(type, snoxeme, literal, line))
     }
 
@@ -126,29 +124,29 @@ data class Scanner(val source:String) {
      * The actual value of a string token is the string (but with the " omitted)
      */
     private fun string() {
-        while(!isAtEnd() && peek() != '"'){
-            if(peek() == '\n') line++
+        while (!isAtEnd() && peek() != '"') {
+            if (peek() == '\n') line++
             advance()
         }
 
-        if(isAtEnd()) com.snox.error(line, "Unterminated String.")
+        if (isAtEnd()) com.snox.error(line, "Unterminated String.")
 
         advance()
 
         val value = source.substring(start + 1, current - 1)
-        addToken(TokenType.STRING,value)
+        addToken(TokenType.STRING, value)
     }
 
     /**
      * Scans a number token of format [0-9]*.[0-9]*
      */
-    private fun number(){
-        while (isDigit(peek())){
+    private fun number() {
+        while (isDigit(peek())) {
             advance()
         }
-        if(peek() == '.' && isDigit(peekNext())) advance()
+        if (peek() == '.' && isDigit(peekNext())) advance()
 
-        while (isDigit(peek())){
+        while (isDigit(peek())) {
             advance()
         }
 
@@ -159,17 +157,17 @@ data class Scanner(val source:String) {
     /**
      * Determines whether a given char is a digit or not
      */
-    private fun isDigit(c:Char) = c in '0'..'9'
+    private fun isDigit(c: Char) = c in '0'..'9'
 
     /**
      * Checks, if a character is an underscore or a letter (lowercae OR uppercase)
      */
-    private fun isAlpha(c:Char) = c == '_' || c in 'a'..'z' || c in 'A'..'Z'
+    private fun isAlpha(c: Char) = c == '_' || c in 'a'..'z' || c in 'A'..'Z'
 
     /**
      * Checks, whether a character is a letter or a digit
      */
-    private fun isAlphanumeric(c:Char) = isAlpha(c) || isDigit(c)
+    private fun isAlphanumeric(c: Char) = isAlpha(c) || isDigit(c)
 
     /**
      * This method "generates" an identifier. We also determine whether we encountered a reserved keyword or an identifier.
@@ -177,22 +175,22 @@ data class Scanner(val source:String) {
      * It uses the MAX MUNCH principle: The more character a string matches the more probabilistic it is that it is THIS special
      * keyword/identifier.
      */
-    private fun identifier(){
-        while (isAlphanumeric(peek())){
+    private fun identifier() {
+        while (isAlphanumeric(peek())) {
             advance()
         }
-        val identifier = source.substring(start,current)
+        val identifier = source.substring(start, current)
 
-        if(keywords.containsKey(identifier)) addToken(keywords.getValue(identifier))
+        if (keywords.containsKey(identifier)) addToken(keywords.getValue(identifier))
         else addToken(TokenType.IDENTIFIER)
     }
 
     /**
      * Determines whether the next char matches the expected char (If it's at the end it returns false)
      */
-    private fun match(expected:Char): Boolean{
-        if(isAtEnd()) return false
-        if(source[current] != expected) return false
+    private fun match(expected: Char): Boolean {
+        if (isAtEnd()) return false
+        if (source[current] != expected) return false
 
         current++
         return true
@@ -201,10 +199,10 @@ data class Scanner(val source:String) {
     /**
      * Peek at the current char (that's what is called a lookahead) and return if not at the end else return null char
      */
-    private fun peek()  = if(isAtEnd()) '\u0000' else source[current]
+    private fun peek() = if (isAtEnd()) '\u0000' else source[current]
 
     /**
      * Peek at the next char and return if not at the end else return null char
      */
-    private fun peekNext() = if(current + 1 >= source.length) '\u0000' else source[current + 1]
+    private fun peekNext() = if (current + 1 >= source.length) '\u0000' else source[current + 1]
 }
