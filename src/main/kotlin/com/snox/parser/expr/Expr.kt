@@ -23,7 +23,7 @@ class Grouping( val expression:Expr):Expr(){
 override fun <T> accept(visitor:Visitor<T>) = visitor.visitGroupingExpr(this)
 }
 
-class Literal( val value:Any):Expr(){
+class Literal( val value:Any?):Expr(){
 override fun <T> accept(visitor:Visitor<T>) = visitor.visitLiteralExpr(this)
 }
 
