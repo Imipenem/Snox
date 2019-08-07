@@ -1,5 +1,7 @@
 package com.snox
 
+import com.snox.error.RuntimeError
+import com.snox.interpreter.Interpreter
 import com.snox.parser.Parser
 import com.snox.scanner.Scanner
 import com.snox.token.Token
@@ -15,20 +17,23 @@ import kotlin.system.exitProcess
 
 class Snox
 
+val interpreter = Interpreter()
 var hadError = false
+var hadRuntimeError = false
 
 @Throws(IOException::class)
 fun main(args: Array<String>) {
     when {
-        args.size > 1 -> {
-            println("Usage: Snox [script]")
-            exitProcess(64)
+        //args.size > 1 -> {
+            //println("Usage: Snox [script]")
+            //exitProcess(64)
         }
-        args.size == 1 -> runFile(args[0]) //run code from file
-        else -> runPrompt() //run interactively step by step
+        //else -> runFile(args[0]) //run code from file
+        //else -> runPrompt() //run interactively step by step
+    runFile("path/to/SNOX-script")
     }
 
-}
+//}
 
 /**
  * This method is invoked when a file will be used for compilation/ the interpreter as the file containing the
@@ -70,6 +75,7 @@ private fun runPrompt() {
 
 private fun run(source: String) {
     if (hadError) exitProcess(65)
+    else if(hadRuntimeError) exitProcess(70)
     val scanner = Scanner(source)
     val tokens = scanner.scanTokens()
 
@@ -78,7 +84,8 @@ private fun run(source: String) {
 
     if (hadError) return
 
-    println(AstPrinter().print(expression!!))
+    //println(AstPrinter().print(expression!!))
+    interpreter.interpret(expression!!)
 }
 
 fun error(line: Int, message: String) {
@@ -94,4 +101,9 @@ private fun report(line: Int, where: String, message: String) {
 fun error(token: Token, message: String) {
     if (token.type == TokenType.EOF) report(token.line, "at end", message)
     else report(token.line, " at '${token.snoxeme}'", message)
+}
+
+fun runtimeError(error:RuntimeError){
+    System.err.println("${error.message} \n[line ${error.token.line} ]")
+    hadRuntimeError = true
 }
