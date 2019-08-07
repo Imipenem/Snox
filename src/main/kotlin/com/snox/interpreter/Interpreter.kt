@@ -8,6 +8,13 @@ import com.snox.token.TokenType
 
 class Interpreter : Visitor<Any?>{
 
+    /**
+     * The main function of the Interpreter class.
+     *
+     * It simply calls the evaluate() and then prints the returned value as a string.
+     *
+     * Otherwise it will throw a RuntimeError
+     */
     fun interpret(expression:Expr){
         try {
             val value = evaluate(expression)
@@ -18,6 +25,12 @@ class Interpreter : Visitor<Any?>{
         }
     }
 
+    /**
+     * This method evaluates binary expressions depending on the operators type and the expressions values.
+     *
+     * Note that it will throw a RuntimeError if the dynamic type cast fail (thus an operation with unsupported
+     * types (values of expressions) is performed)
+     */
     override fun visitBinaryExpr(expr: Binary): Any? {
         val right = evaluate(expr.right)
         val left = evaluate(expr.left)
@@ -75,7 +88,8 @@ class Interpreter : Visitor<Any?>{
     override fun visitLiteralExpr(expr: Literal) = expr.value
 
     /**
-     * Post-order traversal
+     * This method evaluates a unary´s expression value after the principle of post order traversal:
+     * In terms of the AST: The child nodes are evaluated (the expressions on the right hand) BEFORE their parents.
      */
     override fun visitUnaryExpr(expr: Unary): Any? {
 
@@ -91,16 +105,28 @@ class Interpreter : Visitor<Any?>{
         return null
     }
 
+    /**
+     * A helper function that actually calls the special accept method of an expression type (and so it´s
+     * special visit() defined in the visitor class (HERE: The Interpreter)
+     */
     private fun evaluate(expr:Expr):Any? {
        return expr.accept(this)
     }
 
+    /**
+     * Determine whether an object is "true" or "false"
+     */
     private fun isTruthy(obj:Any?):Boolean{
         if(obj == null) return false
         else if(obj is Boolean) return obj.toString().toBoolean()
         return true
     }
 
+    /**
+     * Determine whether two objects are equal.
+     *
+     * Note that "==" fulfills the IEEE 754 conventions regarding doubles
+     */
     private fun isEqual(left:Any?, right:Any?):Boolean{
 
         if(left == null && right == null) return true
@@ -111,16 +137,30 @@ class Interpreter : Visitor<Any?>{
 
     }
 
+    /**
+     * This function checks whether the requirement of certain unary expression (that is, it´s operands is a number)
+     * is fulfilled
+     */
     private fun checkOperandIsNumber(operator:Token, right:Any?){
         if(right is Double) return
         throw RuntimeError(operator,"Expected a Number after operator $operator")
     }
 
+    /**
+     * This function checks whether the requirement of certain binary expression (that is, it´s operands are numbers)
+     * is fulfilled
+     */
     private fun checkBinaryOperandsAreNumbers(operator: Token, left:Any?, right:Any?){
         if(left is Double && right is Double) return
         throw RuntimeError(operator, "Expected numbers with binary operator ${operator.snoxeme}")
     }
 
+    /**
+     * Helper function to cast a value of an expression into a string.
+     *
+     * Note that a .0 will be erased (since all numbers will be internally traded as Doubles)
+     * to represent them as Integers
+     */
     private fun stringify(value:Any?):String{
 
         if(value == null) return "nil"
