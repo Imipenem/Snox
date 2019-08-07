@@ -12,12 +12,16 @@ fun main(args:Array<String>){
     //if(args.size != 1){
       //  error("Script Usage: Generate_AST <output directory>")
     //}
-    val outputDir = "path/to/parser/expr"
+    val outputDir = "path/to/exprAndStmt"
     defineAst(outputDir, "Expr", arrayListOf(
             "Binary   ; val left:Expr, val operator:Token, val right:Expr",
             "Grouping ; val expression:Expr",
-            "Literal  ; val value:Any",
+            "Literal  ; val value:Any?",
             "Unary    ; val operator:Token, val right:Expr"
+    ))
+    defineAst(outputDir, "Stmt", arrayListOf(
+            "Expression   ; val expression:Expr",
+            "Print       ; val expression:Expr"
     ))
 
 }
