@@ -35,7 +35,8 @@ class Interpreter : Visitor<Any?>{
                 return  left as Double * right as Double
             }
             TokenType.PLUS -> {
-                if(left is Double && right is Double) return left + right //using kotlin smart casts here
+                if((left is Double && right is String) || (left is String && right is Double)) return left.toString() + right
+                else if(left is Double && right is Double) return left + right //using kotlin smart casts here
                 else if(left is String && right is String) return left + right //using kotlin smart casts here
 
                 throw RuntimeError(expr.operator, "Unsupported type for binary operator ${expr.operator}. " +
@@ -124,11 +125,9 @@ class Interpreter : Visitor<Any?>{
 
         if(value == null) return "nil"
 
-        else if (value is Double){
-            var text = value.toString()
-
-            if(text.endsWith(".0")) text = text.substring(0,text.length - 2)
-            return text
+        else if (value.toString().endsWith(".0")){
+            val text = value.toString()
+            return text.substring(0,text.length - 2)
         }
         return value.toString()
     }
