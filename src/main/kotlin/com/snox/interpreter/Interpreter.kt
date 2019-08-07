@@ -41,6 +41,7 @@ class Interpreter : Visitor<Any?>{
             }
             TokenType.SLASH -> {
                 checkBinaryOperandsAreNumbers(expr.operator, left, right)
+                if(right == 0.0) throw RuntimeError(expr.operator, "Arithmetic Error: Division by zero is not allowed")
                 return left as Double / right as Double
             }
             TokenType.STAR -> {
