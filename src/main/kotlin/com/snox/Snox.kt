@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
         }
         //else -> runFile(args[0]) //run code from file
         //else -> runPrompt() //run interactively step by step
-    runFile("path/to/SNOX-script")
+    runFile("/home/thelichking/Desktop/test.txt")
     }
 
 //}
@@ -80,12 +80,12 @@ private fun run(source: String) {
     val tokens = scanner.scanTokens()
 
     val parser = Parser(tokens)
-    val expression = parser.parse()
+    val statements = parser.parse()
 
     if (hadError) return
 
     //println(AstPrinter().print(expression!!))
-    interpreter.interpret(expression!!)
+    interpreter.interpret(statements)
 }
 
 fun error(line: Int, message: String) {

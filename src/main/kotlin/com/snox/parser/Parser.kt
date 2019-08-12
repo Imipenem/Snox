@@ -1,11 +1,7 @@
 package com.snox.parser
 
+import com.snox.parser.expr.*
 import com.snox.error as err
-import com.snox.parser.expr.Binary
-import com.snox.parser.expr.Expr
-import com.snox.parser.expr.Grouping
-import com.snox.parser.expr.Literal
-import com.snox.parser.expr.Unary
 import com.snox.token.Token
 import com.snox.token.TokenType
 import java.lang.RuntimeException
@@ -26,15 +22,32 @@ class Parser(private val tokens: List<Token>) {
     /**
      * This is the actual "parse" main function.
      *
-     * As for now, it can only parse one line expressions and otherwise it returns null, in
-     * case of any Parse Errors thrown.
+     * NEW IMPL DOC TODO!!!!
      */
-    fun parse(): Expr? {
-        return try {
-            expression()
-        } catch (e: ParseError) {
-            null
+    fun parse(): List<Stmt> {
+
+        val statements = ArrayList<Stmt>()
+
+        while (!isAtEnd()) {
+            statements.add(statement())
         }
+        return statements
+    }
+
+    private fun statement() = if(match(TokenType.PRINT)) printStatement() else expressionStatement()
+
+    private fun printStatement():Stmt {
+        val value = expression()
+        consume(TokenType.SEMI_COL, "Expected ; after statement.")
+
+        return Print(value)
+    }
+
+    private fun expressionStatement():Stmt {
+        val value = expression()
+        consume(TokenType.SEMI_COL, "Expected ; after statement.")
+
+        return Expression(value)
     }
 
     private fun expression() = equality()

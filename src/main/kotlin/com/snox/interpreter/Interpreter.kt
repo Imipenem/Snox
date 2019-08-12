@@ -6,7 +6,15 @@ import com.snox.parser.expr.*
 import com.snox.token.Token
 import com.snox.token.TokenType
 
-class Interpreter : Visitor<Any?>{
+class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
+    override fun visitExpressionStmt(stmt: Expression) {
+        evaluate(stmt.expression)
+    }
+
+    override fun visitPrintStmt(stmt: Print) {
+        val value = evaluate(stmt.expression)
+        println(stringify(value))
+    }
 
     /**
      * The main function of the Interpreter class.
@@ -15,10 +23,11 @@ class Interpreter : Visitor<Any?>{
      *
      * Otherwise it will throw a RuntimeError
      */
-    fun interpret(expression:Expr){
+    fun interpret(statements:List<Stmt>) {
         try {
-            val value = evaluate(expression)
-            println(stringify(value))
+            for(statement in statements) {
+                execute(statement)
+            }
         }
         catch (error:RuntimeError){
             runtimeError(error)
@@ -114,6 +123,10 @@ class Interpreter : Visitor<Any?>{
        return expr.accept(this)
     }
 
+    private fun execute(stmt:Stmt){
+        stmt.accept(this)
+    }
+
     /**
      * Determine whether an object is "true" or "false"
      */
@@ -172,5 +185,4 @@ class Interpreter : Visitor<Any?>{
         }
         return value.toString()
     }
-
 }
