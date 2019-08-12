@@ -24,14 +24,36 @@ class Parser(private val tokens: List<Token>) {
      *
      * NEW IMPL DOC TODO!!!!
      */
-    fun parse(): List<Stmt> {
+    fun parse(): List<Stmt?> {
 
-        val statements = ArrayList<Stmt>()
+        val statements = ArrayList<Stmt?>()
 
         while (!isAtEnd()) {
-            statements.add(statement())
+            statements.add(declaration())
         }
         return statements
+    }
+
+    private fun declaration():Stmt? {
+        try {
+            if (match(TokenType.VAR)) return varStatement()
+
+            return statement()
+        }
+        catch (e:ParseError){
+            synchronize()
+            return null
+        }
+    }
+
+    private fun varStatement():Stmt? {
+        val name = consume(TokenType.IDENTIFIER, "Expected a variables name.")
+
+        var initializer:Expr? = null
+        if(match(TokenType.EQUAL)) initializer = expression()
+
+        consume(TokenType.SEMI_COL, "Expected ; after declaration or statement.")
+        return null
     }
 
     private fun statement() = if(match(TokenType.PRINT)) printStatement() else expressionStatement()
@@ -147,6 +169,8 @@ class Parser(private val tokens: List<Token>) {
             match(TokenType.NIL) -> return Literal(null)
 
             match(TokenType.STRING, TokenType.NUMBER) -> return Literal(previous().literal)
+
+            match(TokenType.IDENTIFIER) -> return Variable(previous())
 
             match(TokenType.LEFT_PAREN) -> {
                 val expr = expression()
