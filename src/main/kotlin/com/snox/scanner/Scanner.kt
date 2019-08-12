@@ -12,9 +12,6 @@ private val keywords = hashMapOf("and" to TokenType.AND, "or" to TokenType.OR, "
 /**
  * This class represents the scanner. A scanner scans the entire source code (line by line) and defragmentates this string
  * into (multiple) valid tokens (or reports an error of its invalid).
- *
- * Note that this does not currently perform any typ of operator precedence checks or valid parenthesis order and similar.
- *
  */
 
 data class Scanner(val source: String) {
@@ -82,8 +79,8 @@ data class Scanner(val source: String) {
             '\n' -> line++
             in '0'..'9' -> number()
             else -> {
-                if (c != ' ' && c != '\r' && c != '\t') com.snox.error(line, "Unexpected Character.")
-                else if (isAlpha(c)) identifier()
+                if (isAlpha(c)) identifier()
+                else if(c != ' ' && c != '\r' && c != '\t') com.snox.error(line, "Unexpected Character.")
             }
         }
 
