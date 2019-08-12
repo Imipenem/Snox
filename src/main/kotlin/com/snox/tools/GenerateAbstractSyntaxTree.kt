@@ -12,16 +12,18 @@ fun main(args:Array<String>){
     //if(args.size != 1){
       //  error("Script Usage: Generate_AST <output directory>")
     //}
-    val outputDir = "path/to/exprAndStmt"
+    val outputDir = "/home/thelichking/IdeaProjects/Snox/src/main/kotlin/com/snox/parser/expr"
     defineAst(outputDir, "Expr", arrayListOf(
             "Binary   ; val left:Expr, val operator:Token, val right:Expr",
             "Grouping ; val expression:Expr",
             "Literal  ; val value:Any?",
-            "Unary    ; val operator:Token, val right:Expr"
+            "Unary    ; val operator:Token, val right:Expr",
+            "Variable ; val name:Token"
     ))
     defineAst(outputDir, "Stmt", arrayListOf(
             "Expression   ; val expression:Expr",
-            "Print       ; val expression:Expr"
+            "Print       ; val expression:Expr",
+            "Var  ; val name:Token , val initializer:Expr "
     ))
 
 }
