@@ -3,6 +3,12 @@ package com.snox.variables
 import com.snox.error.RuntimeError
 import com.snox.token.Token
 
+/**
+ * This class represents an environment for variables.
+ *
+ * Variables (for now only global variables) are represented through a key-value pair.
+ * Using a variable, that is probably never declared or used before declared, results in a runtime error.
+ */
 class Environment {
     private val values = HashMap<String, Any?>()
 

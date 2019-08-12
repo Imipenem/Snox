@@ -19,7 +19,7 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
     /**
      * The main function of the Interpreter class.
      *
-     * It simply calls the evaluate() and then prints the returned value as a string.
+     * It will execute each statement that has been parsed and has the correct syntax.
      *
      * Otherwise it will throw a RuntimeError
      */

@@ -22,7 +22,7 @@ class Parser(private val tokens: List<Token>) {
     /**
      * This is the actual "parse" main function.
      *
-     * NEW IMPL DOC TODO!!!!
+     * For now it parses declarations (wont compile as for now)
      */
     fun parse(): List<Stmt?> {
 
@@ -34,6 +34,9 @@ class Parser(private val tokens: List<Token>) {
         return statements
     }
 
+    /**
+     * This function decides whether a declaration is a variable declaration or another statement.
+     */
     private fun declaration():Stmt? {
         try {
             if (match(TokenType.VAR)) return varStatement()
@@ -46,6 +49,11 @@ class Parser(private val tokens: List<Token>) {
         }
     }
 
+    /**
+     * This function is called when a variable is declared.
+     *
+     * Note that in case of no initialization, the default value is null.
+     */
     private fun varStatement():Stmt? {
         val name = consume(TokenType.IDENTIFIER, "Expected a variables name.")
 
@@ -56,6 +64,9 @@ class Parser(private val tokens: List<Token>) {
         return null
     }
 
+    /**
+     * This function differences between a print statement and an expression statement
+     */
     private fun statement() = if(match(TokenType.PRINT)) printStatement() else expressionStatement()
 
     private fun printStatement():Stmt {
@@ -65,6 +76,9 @@ class Parser(private val tokens: List<Token>) {
         return Print(value)
     }
 
+    /**
+     * This function checks, if an expression always ends with a ; and then parses the expression.
+     */
     private fun expressionStatement():Stmt {
         val value = expression()
         consume(TokenType.SEMI_COL, "Expected ; after statement.")
