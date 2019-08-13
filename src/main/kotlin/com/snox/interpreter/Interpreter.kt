@@ -5,8 +5,21 @@ import com.snox.error.RuntimeError
 import com.snox.parser.expr.*
 import com.snox.token.Token
 import com.snox.token.TokenType
+import com.snox.variables.Environment
 
 class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
+
+    private val environment = Environment()
+
+    override fun visitVariableExpr(expr: Variable) = environment.get(expr.name)
+
+    override fun visitVarStmt(stmt: Var) {
+        var value:Any? = null
+
+        if(stmt.initializer != null) value = evaluate(stmt.initializer)
+        environment.define(stmt.name.snoxeme, value)
+    }
+
     override fun visitExpressionStmt(stmt: Expression) {
         evaluate(stmt.expression)
     }
@@ -23,7 +36,7 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
      *
      * Otherwise it will throw a RuntimeError
      */
-    fun interpret(statements:List<Stmt>) {
+    fun interpret(statements:List<Stmt?>) {
         try {
             for(statement in statements) {
                 execute(statement)
@@ -123,8 +136,8 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
        return expr.accept(this)
     }
 
-    private fun execute(stmt:Stmt){
-        stmt.accept(this)
+    private fun execute(stmt:Stmt?){
+        stmt?.accept(this)
     }
 
     /**

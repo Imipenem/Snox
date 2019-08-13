@@ -39,7 +39,7 @@ class Parser(private val tokens: List<Token>) {
      */
     private fun declaration():Stmt? {
         try {
-            if (match(TokenType.VAR)) return varStatement()
+            if (match(TokenType.VAR)) return varDeclaration()
 
             return statement()
         }
@@ -54,14 +54,14 @@ class Parser(private val tokens: List<Token>) {
      *
      * Note that in case of no initialization, the default value is null.
      */
-    private fun varStatement():Stmt? {
+    private fun varDeclaration():Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expected a variables name.")
 
         var initializer:Expr? = null
         if(match(TokenType.EQUAL)) initializer = expression()
 
         consume(TokenType.SEMI_COL, "Expected ; after declaration or statement.")
-        return null
+        return Var(name,initializer)
     }
 
     /**

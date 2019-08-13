@@ -24,7 +24,7 @@ class Print(val expression: Expr) : Stmt() {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitPrintStmt(this)
 }
 
-class Var(val name: Token, val initializer:Expr):Stmt(){
+class Var(val name: Token, val initializer:Expr?):Stmt(){
     override fun <T> accept(visitor:Visitor<T>) = visitor.visitVarStmt(this)
 }
 
