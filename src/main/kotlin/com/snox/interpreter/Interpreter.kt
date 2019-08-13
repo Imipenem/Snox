@@ -11,6 +11,12 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
 
     private val environment = Environment()
 
+    override fun visitAssignExpr(expr: Assign): Any? {
+        val value = evaluate(expr.value)
+        environment.assign(expr.name, value)
+        return value
+    }
+
     override fun visitVariableExpr(expr: Variable) = environment.get(expr.name)
 
     override fun visitVarStmt(stmt: Var) {

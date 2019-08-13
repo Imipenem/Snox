@@ -21,4 +21,13 @@ class Environment {
 
         throw RuntimeError(name, "Undefined variable ${name.snoxeme}.")
     }
+
+    fun assign(name:Token, value:Any?) {
+        if(values.containsKey(name.snoxeme)) {
+            values[name.snoxeme] = value
+            return
+        }
+
+        throw RuntimeError(name,"Assigned value to undefined variable ${name.snoxeme}.")
+    }
 }

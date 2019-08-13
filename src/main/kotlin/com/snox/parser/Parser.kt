@@ -86,7 +86,25 @@ class Parser(private val tokens: List<Token>) {
         return Expression(value)
     }
 
-    private fun expression() = equality()
+    private fun expression() = assignement()
+
+    private fun assignement():Expr {
+
+        val expr = equality()
+
+        if(match(TokenType.EQUAL)) {
+            val equals = previous()
+            val value = assignement()
+
+            if(expr is Variable) {
+                val name = expr.name
+                return Assign(name, value)
+            }
+
+            error(equals, "Invalid assignement!")
+        }
+        return expr
+    }
 
     /**
      * This function parses equality expressions (lowest precedence) into the AST. This works as follows:

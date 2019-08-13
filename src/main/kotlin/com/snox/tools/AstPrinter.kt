@@ -16,6 +16,10 @@ fun main(){
  */
 
 class AstPrinter : Visitor<String>{
+    override fun visitAssignExpr(expr: Assign): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun visitVariableExpr(expr: Variable): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
