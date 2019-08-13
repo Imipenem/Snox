@@ -14,6 +14,7 @@ fun main(args:Array<String>){
     //}
     val outputDir = "/home/thelichking/IdeaProjects/Snox/src/main/kotlin/com/snox/parser/expr"
     defineAst(outputDir, "Expr", arrayListOf(
+            "Assign   ; val name:Token, val value:Expr",
             "Binary   ; val left:Expr, val operator:Token, val right:Expr",
             "Grouping ; val expression:Expr",
             "Literal  ; val value:Any?",
@@ -47,7 +48,7 @@ private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String
     writer.println("/**")
     writer.println("* Auto generated AST for parsing SNOX expressions (Superclass Expr for clarification only) ")
     writer.println("*/")
-    writer.println("abstract class Expr{")
+    writer.println("abstract class $baseName{")
     writer.println("abstract fun <T> accept(visitor: Visitor<T>):T")
     writer.println("}")
     writer.println()
@@ -59,7 +60,7 @@ private fun defineAst(outputDir:String, baseName:String, types: ArrayList<String
 
     for(e in types){
         val descr = e.trim().split(";")
-        writer.println("class ${descr[0].trim()}(${descr[1]}):Expr(){")
+        writer.println("class ${descr[0].trim()}(${descr[1]}):$baseName(){")
         writer.println("override fun <T> accept(visitor:Visitor<T>) = visitor.visit${descr[0].trim()}$baseName(this)")
         writer.println("}")
         writer.println()
