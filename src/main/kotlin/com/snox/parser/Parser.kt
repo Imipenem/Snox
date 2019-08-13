@@ -67,7 +67,11 @@ class Parser(private val tokens: List<Token>) {
     /**
      * This function differences between a print statement and an expression statement
      */
-    private fun statement() = if(match(TokenType.PRINT)) printStatement() else expressionStatement()
+    private fun statement():Stmt {
+        if(match(TokenType.PRINT)) return printStatement()
+        if(match(TokenType.LEFT_BRACE)) return Block(block())
+        return expressionStatement()
+    }
 
     private fun printStatement():Stmt {
         val value = expression()
@@ -84,6 +88,18 @@ class Parser(private val tokens: List<Token>) {
         consume(TokenType.SEMI_COL, "Expected ; after statement.")
 
         return Expression(value)
+    }
+
+    private fun block():List<Stmt?> {
+
+        val statements = ArrayList<Stmt?>()
+
+        while(!(check(TokenType.RIGHT_BRACE) && !isAtEnd())) {
+            statements.add(declaration())
+        }
+
+        consume(TokenType.RIGHT_BRACE, "Expected closing }")
+        return statements
     }
 
     private fun expression() = assignement()

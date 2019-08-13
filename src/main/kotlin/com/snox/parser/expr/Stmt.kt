@@ -10,10 +10,15 @@ abstract class Stmt {
 
 
     interface Visitor<T> {
+        fun visitBlockStmt(stmt: Block): T
         fun visitExpressionStmt(stmt: Expression): T
         fun visitPrintStmt(stmt: Print): T
         fun visitVarStmt(stmt:Var):T
     }
+}
+
+class Block(val statements: List<Stmt?>) : Stmt() {
+    override fun <T> accept(visitor: Visitor<T>) = visitor.visitBlockStmt(this)
 }
 
 class Expression(val expression: Expr) : Stmt() {

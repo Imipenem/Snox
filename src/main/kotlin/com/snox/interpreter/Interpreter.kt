@@ -9,7 +9,11 @@ import com.snox.variables.Environment
 
 class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
 
-    private val environment = Environment()
+    private var environment = Environment()
+
+    override fun visitBlockStmt(stmt: Block) {
+        executeBlock(stmt.statements, Environment(environment))
+    }
 
     override fun visitAssignExpr(expr: Assign): Any? {
         val value = evaluate(expr.value)
@@ -144,6 +148,20 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
 
     private fun execute(stmt:Stmt?){
         stmt?.accept(this)
+    }
+
+    private fun executeBlock(statements: List<Stmt?>, environment: Environment){
+        val previous = this.environment
+
+        try {
+            this.environment = environment
+
+            for(statement in statements){
+                execute(statement)
+            }
+        } finally {
+            this.environment = previous
+        }
     }
 
     /**

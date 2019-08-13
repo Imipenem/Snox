@@ -22,6 +22,7 @@ fun main(args:Array<String>){
             "Variable ; val name:Token"
     ))
     defineAst(outputDir, "Stmt", arrayListOf(
+            "Block     ; val statements:List<Stmt?>",
             "Expression   ; val expression:Expr",
             "Print       ; val expression:Expr",
             "Var  ; val name:Token , val initializer:Expr "
