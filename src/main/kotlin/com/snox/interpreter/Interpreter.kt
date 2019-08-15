@@ -8,8 +8,26 @@ import com.snox.token.TokenType
 import com.snox.variables.Environment
 
 class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
-
+    
     private var environment = Environment()
+
+    override fun visitLogicalExpr(expr: Logical): Any? {
+        val left = evaluate(expr)
+
+        if(expr.operator.type == TokenType.OR) {
+            if (isTruthy(left)) return left
+        }
+
+        else {
+            if (!isTruthy(left)) return left
+        }
+        return evaluate(expr.right)
+        }
+
+    override fun visitIfStmt(stmt: If) {
+        if(isTruthy(evaluate(stmt.condition))) execute(stmt.thenBranch)
+        else if (stmt.elseBranch != null) execute(stmt.elseBranch)
+    }
 
     override fun visitBlockStmt(stmt: Block) {
         executeBlock(stmt.statements, Environment(environment))

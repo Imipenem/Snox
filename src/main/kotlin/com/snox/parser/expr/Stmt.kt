@@ -14,6 +14,8 @@ abstract class Stmt {
         fun visitExpressionStmt(stmt: Expression): T
         fun visitPrintStmt(stmt: Print): T
         fun visitVarStmt(stmt:Var):T
+        fun visitIfStmt(stmt:If):T
+        fun visitWhileStmt(stmt:While):T
     }
 }
 
@@ -31,5 +33,13 @@ class Print(val expression: Expr) : Stmt() {
 
 class Var(val name: Token, val initializer:Expr?):Stmt(){
     override fun <T> accept(visitor:Visitor<T>) = visitor.visitVarStmt(this)
+}
+
+class If( val condition:Expr, val thenBranch:Stmt, val elseBranch:Stmt?):Stmt(){
+    override fun <T> accept(visitor:Visitor<T>) = visitor.visitIfStmt(this)
+}
+
+class While(val condition: Expr, val body:Stmt):Stmt(){
+    override fun <T> accept(visitor:Visitor<T>) = visitor.visitWhileStmt(this)
 }
 

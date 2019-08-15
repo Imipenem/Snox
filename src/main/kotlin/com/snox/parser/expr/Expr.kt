@@ -13,6 +13,7 @@ fun visitAssignExpr(expr:Assign):T
 fun visitBinaryExpr(expr:Binary):T
 fun visitGroupingExpr(expr:Grouping):T
 fun visitLiteralExpr(expr:Literal):T
+fun visitLogicalExpr(expr:Logical):T
 fun visitUnaryExpr(expr:Unary):T
 fun visitVariableExpr(expr:Variable):T
 }
@@ -31,6 +32,10 @@ override fun <T> accept(visitor:Visitor<T>) = visitor.visitGroupingExpr(this)
 
 class Literal( val value:Any?):Expr(){
 override fun <T> accept(visitor:Visitor<T>) = visitor.visitLiteralExpr(this)
+}
+
+class Logical( val left:Expr, val operator:Token, val right:Expr):Expr(){
+override fun <T> accept(visitor:Visitor<T>) = visitor.visitLogicalExpr(this)
 }
 
 class Unary( val operator:Token, val right:Expr):Expr(){
