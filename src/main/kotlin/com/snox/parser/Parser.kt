@@ -5,6 +5,7 @@ import com.snox.error as err
 import com.snox.token.Token
 import com.snox.token.TokenType
 import java.lang.RuntimeException
+import kotlin.collections.ArrayList
 
 /**
  * This class represents the Parser used to parse scanned SNOX tokens into an AST besides some basic syntax error handling.
@@ -70,6 +71,7 @@ class Parser(private val tokens: List<Token>) {
     private fun statement():Stmt {
         if(match(TokenType.IF)) return ifStatement()
         if(match(TokenType.WHILE)) return whileStatement()
+        if(match(TokenType.FOR)) return forStatement()
         if(match(TokenType.PRINT)) return printStatement()
         if(match(TokenType.LEFT_BRACE)) return Block(block())
         return expressionStatement()
@@ -101,6 +103,34 @@ class Parser(private val tokens: List<Token>) {
         val body = statement()
 
         return While(condition, body)
+    }
+
+    private fun forStatement():Stmt {
+        consume(TokenType.LEFT_PAREN, "Expected a '(' in for loop")
+
+        val initializer = when {
+            match(TokenType.SEMI_COL) -> null
+            match(TokenType.VAR) -> varDeclaration()
+            else -> expressionStatement()
+        }
+
+        var condition = if(!check(TokenType.SEMI_COL)) expression()
+                        else null
+        consume(TokenType.SEMI_COL, "Expected ; after loop condition")
+
+        val increment = if(!check(TokenType.SEMI_COL)) expression()
+                        else null
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after for loop")
+
+        var body = statement()
+
+        if(increment != null) body = Block(listOf(body, Expression(increment)))
+        if(condition == null) condition = Literal(true)
+        body = While(condition, body)
+        if(initializer != null) body = Block(listOf(initializer,body))
+
+
+        return body
     }
 
     private fun printStatement():Stmt {
