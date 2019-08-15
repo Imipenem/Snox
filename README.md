@@ -7,9 +7,9 @@ It does not do any static code analysis (no compiling in is purest sense),
 but it does some syntax error checking while parsing.
 
 ### Current State
-As for now, Snox can parse and execute simple assignements like expressions,
+As for now, Snox can parse and execute simple assignments like expressions and
 it understand variable declaration and their scoping separated by blocks.
-However, there´s currently no support for classes and functions (which will come soon).
+However, there's currently no support for classes and functions (which will come soon).
 
 ### Basic Syntax
 
