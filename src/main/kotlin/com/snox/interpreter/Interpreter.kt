@@ -11,6 +11,12 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
     
     private var environment = Environment()
 
+    override fun visitWhileStmt(stmt: While) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
+    }
+
     override fun visitLogicalExpr(expr: Logical): Any? {
         val left = evaluate(expr)
 
