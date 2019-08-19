@@ -11,6 +11,10 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
     
     private var environment = Environment()
 
+    override fun visitCallExpr(expr: Call): Any? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun visitWhileStmt(stmt: While) {
         while (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.body)

@@ -11,6 +11,7 @@ abstract fun <T> accept(visitor: Visitor<T>):T
 interface Visitor <T> { 
 fun visitAssignExpr(expr:Assign):T
 fun visitBinaryExpr(expr:Binary):T
+fun visitCallExpr(expr:Call):T
 fun visitGroupingExpr(expr:Grouping):T
 fun visitLiteralExpr(expr:Literal):T
 fun visitLogicalExpr(expr:Logical):T
@@ -24,6 +25,10 @@ override fun <T> accept(visitor:Visitor<T>) = visitor.visitAssignExpr(this)
 
 class Binary( val left:Expr, val operator:Token, val right:Expr):Expr(){
 override fun <T> accept(visitor:Visitor<T>) = visitor.visitBinaryExpr(this)
+}
+
+class Call( val callee:Expr, paren:Token, arguments: List<Expr>):Expr(){
+override fun <T> accept(visitor:Visitor<T>) = visitor.visitCallExpr(this)
 }
 
 class Grouping( val expression:Expr):Expr(){
