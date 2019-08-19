@@ -1,6 +1,7 @@
 package com.snox.parser
 
 import com.snox.parser.expr.*
+import com.snox.parser.expr.Function
 import com.snox.error as err
 import com.snox.token.Token
 import com.snox.token.TokenType
@@ -40,6 +41,7 @@ class Parser(private val tokens: List<Token>) {
      */
     private fun declaration():Stmt? {
         try {
+            if(match(TokenType.FUN)) return function("function")
             if (match(TokenType.VAR)) return varDeclaration()
 
             return statement()
@@ -148,6 +150,24 @@ class Parser(private val tokens: List<Token>) {
         consume(TokenType.SEMI_COL, "Expected ; after statement.")
 
         return Expression(value)
+    }
+
+    private fun function(kind:String):Function {
+        val name:Token = consume(TokenType.IDENTIFIER, "Expect $kind name")
+        consume(TokenType.LEFT_PAREN, "Expect ( after $kind name")
+        val parameters = ArrayList<Token>()
+
+        if(!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (parameters.size >= 255) error(peek(),"No more than 255 arguments")
+                parameters.add(consume(TokenType.IDENTIFIER, "Expect parameter name"))
+            }
+            while (match(TokenType.COMMA))
+        }
+        consume(TokenType.RIGHT_PAREN, "Expected ) after parameters")
+        consume(TokenType.LEFT_BRACE, "Expected { before $kind body")
+        val body = block()
+        return Function(name, parameters, body)
     }
 
     private fun block():List<Stmt?> {

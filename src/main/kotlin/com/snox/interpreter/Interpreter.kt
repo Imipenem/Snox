@@ -3,16 +3,46 @@ package com.snox.interpreter
 import com.snox.runtimeError
 import com.snox.error.RuntimeError
 import com.snox.parser.expr.*
+import com.snox.parser.expr.Function
+import com.snox.parser.function.SnoxCallable
+import com.snox.parser.function.SnoxFunction
 import com.snox.token.Token
 import com.snox.token.TokenType
 import com.snox.variables.Environment
 
 class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
-    
-    private var environment = Environment()
+
+    val globals = Environment()
+    private var environment = globals
+
+    constructor() {
+        globals.define("clock", object: SnoxCallable {
+            override fun call(interpreter: Interpreter, arguments: List<Any?>) = (System.currentTimeMillis() / 1000.0)
+            override fun arity() = 0
+            override fun toString() = "<native fn>"
+        })
+    }
+
+    override fun visitFunctionStmt(stmt: Function) {
+        val function = SnoxFunction(stmt)
+        environment.define(stmt.name.snoxeme, function)
+    }
 
     override fun visitCallExpr(expr: Call): Any? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        val callee = evaluate(expr.callee)
+        val arguments = ArrayList<Any?>()
+
+        for(argument in expr.arguments) {
+            arguments.add(evaluate(argument))
+        }
+
+        if(callee !is SnoxCallable) throw RuntimeError(expr.paren, "Only functions and classes are callable!")
+        val function:SnoxCallable = callee
+        if(arguments.size != function.arity()) throw RuntimeError(expr.paren, "Expected ${function.arity()} arguments" +
+                "but got ${arguments.size}!")
+
+        return function.call(this,arguments)
     }
 
     override fun visitWhileStmt(stmt: While) {
@@ -178,7 +208,7 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
         stmt?.accept(this)
     }
 
-    private fun executeBlock(statements: List<Stmt?>, environment: Environment){
+   fun executeBlock(statements: List<Stmt?>, environment: Environment){
         val previous = this.environment
 
         try {
