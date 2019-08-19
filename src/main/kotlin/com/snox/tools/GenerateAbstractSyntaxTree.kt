@@ -28,6 +28,7 @@ fun main(args:Array<String>){
             "Expression   ; val expression:Expr",
             "Print       ; val expression:Expr",
             "If    ; val condition:Expr, val thenBranch:Stmt, val elseBranch:Stmt?",
+            "Function ; val name:Token, val params: List<Token>, val body:List<Stmt>",
             "While ; val condition:Expr, val body:Stmt",
             "Var  ; val name:Token , val initializer:Expr "
     ))
