@@ -27,7 +27,7 @@ class Binary( val left:Expr, val operator:Token, val right:Expr):Expr(){
 override fun <T> accept(visitor:Visitor<T>) = visitor.visitBinaryExpr(this)
 }
 
-class Call( val callee:Expr, paren:Token, arguments: List<Expr>):Expr(){
+class Call( val callee:Expr, val paren:Token, val arguments: List<Expr>):Expr(){
 override fun <T> accept(visitor:Visitor<T>) = visitor.visitCallExpr(this)
 }
 
