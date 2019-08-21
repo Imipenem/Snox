@@ -30,6 +30,7 @@ fun main(args:Array<String>){
             "If    ; val condition:Expr, val thenBranch:Stmt, val elseBranch:Stmt?",
             "Function ; val name:Token, val params: List<Token>, val body:List<Stmt?>",
             "While ; val condition:Expr, val body:Stmt",
+            "Return ; val keyword:Token, val value:Expr?",
             "Var  ; val name:Token , val initializer:Expr "
     ))
 

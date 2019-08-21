@@ -17,6 +17,7 @@ abstract class Stmt {
         fun visitFunctionStmt(stmt:Function):T
         fun visitIfStmt(stmt:If):T
         fun visitWhileStmt(stmt:While):T
+        fun visitReturnStmt(stmt:Return):T
     }
 }
 
@@ -46,5 +47,8 @@ class If( val condition:Expr, val thenBranch:Stmt, val elseBranch:Stmt?):Stmt(){
 
 class While(val condition: Expr, val body:Stmt):Stmt(){
     override fun <T> accept(visitor:Visitor<T>) = visitor.visitWhileStmt(this)
+}
+class Return( val keyword:Token, val value:Expr?):Stmt(){
+    override fun <T> accept(visitor:Visitor<T>) = visitor.visitReturnStmt(this)
 }
 
