@@ -12,7 +12,12 @@ class SnoxFunction(val declaration:Function):SnoxCallable {
         for(i in 0 until declaration.params.size) {
             environment.define(declaration.params[i].snoxeme, arguments[i])
         }
-        interpreter.executeBlock(declaration.body, environment)
+        try {
+            interpreter.executeBlock(declaration.body, environment)
+        }
+        catch (returnvalue:Return) {
+            return returnvalue.value
+        }
         return null
     }
 

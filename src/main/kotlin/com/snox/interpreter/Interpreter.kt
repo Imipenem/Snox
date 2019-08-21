@@ -8,6 +8,7 @@ import com.snox.parser.function.SnoxCallable
 import com.snox.parser.function.SnoxFunction
 import com.snox.token.Token
 import com.snox.token.TokenType
+import com.snox.parser.function.Return as ret
 import com.snox.variables.Environment
 
 class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
@@ -21,6 +22,13 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
             override fun arity() = 0
             override fun toString() = "<native fn>"
         })
+    }
+
+    override fun visitReturnStmt(stmt: Return) {
+        var value:Any? = null
+
+        if(stmt.value != null) value = evaluate(stmt.value)
+        throw ret(value)
     }
 
     override fun visitFunctionStmt(stmt: Function) {

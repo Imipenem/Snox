@@ -76,6 +76,7 @@ class Parser(private val tokens: List<Token>) {
         if(match(TokenType.FOR)) return forStatement()
         if(match(TokenType.PRINT)) return printStatement()
         if(match(TokenType.LEFT_BRACE)) return Block(block())
+        if(match(TokenType.RETURN)) return returnStatement()
         return expressionStatement()
     }
 
@@ -140,6 +141,16 @@ class Parser(private val tokens: List<Token>) {
         consume(TokenType.SEMI_COL, "Expected ; after statement.")
 
         return Print(value)
+    }
+
+    private fun returnStatement():Stmt {
+        val keyword = previous()
+        var value:Expr? = null
+
+        if(!check(TokenType.SEMI_COL)) value = expression()
+
+        consume(TokenType.SEMI_COL, "Expected ; after return statement.")
+        return Return(keyword, value)
     }
 
     /**
