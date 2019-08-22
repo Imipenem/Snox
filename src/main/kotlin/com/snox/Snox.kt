@@ -6,7 +6,6 @@ import com.snox.parser.Parser
 import com.snox.scanner.Scanner
 import com.snox.token.Token
 import com.snox.token.TokenType
-import com.snox.tools.AstPrinter
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader

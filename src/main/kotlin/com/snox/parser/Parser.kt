@@ -37,7 +37,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     /**
-     * This function decides whether a declaration is a variable declaration or another statement.
+     * This function decides whether a declaration is a variable declaration/ function statement or another statement.
      */
     private fun declaration():Stmt? {
         try {
@@ -81,7 +81,8 @@ class Parser(private val tokens: List<Token>) {
     }
 
     /**
-     * TODO: DOCUMENTATION
+     * This function is called in the case of an if statement with a if then branch and an else branch.
+     * The else-branch is optional and thus can be null!
      *
      * Note: Else - statement is bound to the nearest If statement!!!
      */
@@ -99,6 +100,11 @@ class Parser(private val tokens: List<Token>) {
         return If(condition, thenBranch, elseBranch)
     }
 
+    /**
+     * This function is called in case of a while statement.
+     * It repeatly checks whether the condition is true and then (if true) examines the statement in the while loop´s body
+     */
+
     private fun whileStatement():Stmt {
         consume(TokenType.LEFT_PAREN, "Expected a '(' before while condition")
         val condition = expression()
@@ -108,6 +114,10 @@ class Parser(private val tokens: List<Token>) {
         return While(condition, body)
     }
 
+    /**
+     * This function is called when a for statement is used.
+     * Note that each of the three components of a common for loop could be null.
+     */
     private fun forStatement():Stmt {
         consume(TokenType.LEFT_PAREN, "Expected a '(' in for loop")
 
@@ -136,6 +146,9 @@ class Parser(private val tokens: List<Token>) {
         return body
     }
 
+    /**
+     * This function is called when a print statement is called.
+     */
     private fun printStatement():Stmt {
         val value = expression()
         consume(TokenType.SEMI_COL, "Expected ; after statement.")
@@ -143,6 +156,11 @@ class Parser(private val tokens: List<Token>) {
         return Print(value)
     }
 
+    /**
+     * This function is called when a return statement has been encountered.
+     * Note that the initial value is set to null so in cases where no explicit return value is specified it will return
+     * the default value, SNOX´s nil.
+     */
     private fun returnStatement():Stmt {
         val keyword = previous()
         var value:Expr? = null
@@ -163,6 +181,12 @@ class Parser(private val tokens: List<Token>) {
         return Expression(value)
     }
 
+    /**
+     * This function is called when we encountered a function in SNOX source code.
+     * The parameters are collected one after another and then the functions body a "block" will be examined.
+     *
+     * Note: Max parameters amount is 255 (like in Java for example)
+     */
     private fun function(kind:String):Function {
         val name:Token = consume(TokenType.IDENTIFIER, "Expect $kind name")
         consume(TokenType.LEFT_PAREN, "Expect ( after $kind name")
@@ -181,6 +205,10 @@ class Parser(private val tokens: List<Token>) {
         return Function(name, parameters, body)
     }
 
+    /**
+     * This function is called when we encountered a block, enclosed by {}.
+     * It simply collects all statements one after another and stores them into a list and returns those statements.
+     */
     private fun block():List<Stmt?> {
 
         val statements = ArrayList<Stmt?>()

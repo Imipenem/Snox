@@ -4,6 +4,12 @@ import com.snox.interpreter.Interpreter
 import com.snox.parser.expr.Function
 import com.snox.variables.Environment
 
+/**
+ * This class represents SNOX functions.
+ *
+ * For each parameter, it defines this one in the corresponding environment.
+ * //MORE
+ */
 
 class SnoxFunction(val declaration:Function):SnoxCallable {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
