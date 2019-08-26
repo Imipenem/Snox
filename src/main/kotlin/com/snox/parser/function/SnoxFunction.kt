@@ -11,9 +11,9 @@ import com.snox.variables.Environment
  * //MORE
  */
 
-class SnoxFunction(val declaration:Function):SnoxCallable {
+class SnoxFunction(val declaration:Function, val closure:Environment):SnoxCallable {
     override fun call(interpreter: Interpreter, arguments: List<Any?>): Any? {
-        val environment = Environment(interpreter.globals)
+        val environment = Environment(closure)
 
         for(i in 0 until declaration.params.size) {
             environment.define(declaration.params[i].snoxeme, arguments[i])

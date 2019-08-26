@@ -32,7 +32,7 @@ class Interpreter : Visitor<Any?>, Stmt.Visitor<Unit>{
     }
 
     override fun visitFunctionStmt(stmt: Function) {
-        val function = SnoxFunction(stmt)
+        val function = SnoxFunction(stmt, environment)
         environment.define(stmt.name.snoxeme, function)
     }
 
