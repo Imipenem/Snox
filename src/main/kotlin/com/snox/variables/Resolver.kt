@@ -4,7 +4,6 @@ import com.snox.interpreter.Interpreter
 import com.snox.parser.expr.*
 import com.snox.parser.expr.Function
 import com.snox.token.Token
-import sun.security.ec.point.ProjectivePoint
 import java.util.*
 import kotlin.collections.HashMap
 
